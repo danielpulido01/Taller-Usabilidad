@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UniCursos · Matrícula en línea</title>
+  <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+  <a class="saltar" href="#contenido">Saltar al contenido principal</a>
+
+  <header class="encabezado">
+    <div class="marca">
+      <img src="logo.svg" alt="UniCursos" width="40" height="40">
+      <span class="marca-nombre" aria-hidden="true">UniCursos</span>
+    </div>
+    <nav aria-label="Principal">
+      <ul>
+        <li><a href="#cursos" aria-current="page">Cursos</a></li>
+        <li><a href="#mis-cursos">Mis cursos</a></li>
+        <li><a href="#registro">Registro</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main id="contenido" tabindex="-1">
+    <h1>Matrícula de cursos</h1>
+
+    <section id="cursos" aria-labelledby="titulo-cursos">
+      <h2 id="titulo-cursos">Cursos disponibles</h2>
+      <form id="form-busqueda" role="search">
+        <label for="buscar">Buscar curso por nombre o código</label>
+        <div class="fila">
+          <input id="buscar" name="q" type="search" autocomplete="off">
+          <button type="submit" class="boton">Buscar</button>
+        </div>
+      </form>
+      <p id="estado-busqueda" class="estado" role="status" aria-live="polite"></p>
+      <ul id="lista-cursos" class="tarjetas"></ul>
+    </section>
+
+    <section id="mis-cursos" aria-labelledby="titulo-mis-cursos">
+      <h2 id="titulo-mis-cursos">Mis cursos</h2>
+      <p id="estado-inscripcion" class="estado" role="status" aria-live="polite"></p>
+      <p id="sin-inscritos">Aún no tiene cursos inscritos.</p>
+      <ul id="lista-inscritos" class="inscritos"></ul>
+    </section>
+
+    <section id="registro" aria-labelledby="titulo-registro">
+      <h2 id="titulo-registro">Registro de estudiante</h2>
+      <p>Los campos marcados como (obligatorio) deben completarse.</p>
+
+      <form id="form-registro" novalidate>
+        <div class="campo">
+          <label for="nombre">Nombre completo <span class="req">(obligatorio)</span></label>
+          <input id="nombre" name="nombre" type="text" autocomplete="name" required aria-describedby="error-nombre">
+          <p id="error-nombre" class="error" hidden></p>
+        </div>
+
+        <div class="campo">
+          <label for="correo">Correo electrónico <span class="req">(obligatorio)</span></label>
+          <input id="correo" name="correo" type="email" autocomplete="email" required aria-describedby="ayuda-correo error-correo">
+          <p id="ayuda-correo" class="ayuda">Ejemplo: ana.perez@correo.com</p>
+          <p id="error-correo" class="error" hidden></p>
+        </div>
+
+        <div class="campo">
+          <label for="telefono">Teléfono (opcional)</label>
+          <input id="telefono" name="telefono" type="tel" autocomplete="tel" aria-describedby="ayuda-telefono">
+          <p id="ayuda-telefono" class="ayuda">Formato: 8888-8888</p>
+        </div>
+
+        <div class="campo">
+          <label for="carrera">Carrera <span class="req">(obligatorio)</span></label>
+          <select id="carrera" name="carrera" required aria-describedby="error-carrera">
+            <option value="">Seleccione una carrera</option>
+            <option>Ingeniería de Software</option>
+            <option>Ingeniería Industrial</option>
+            <option>Administración de Empresas</option>
+          </select>
+          <p id="error-carrera" class="error" hidden></p>
+        </div>
+
+        <div class="campo">
+          <label for="contrasena">Contraseña <span class="req">(obligatorio)</span></label>
+          <div class="fila">
+            <input id="contrasena" name="contrasena" type="password" autocomplete="new-password" required minlength="8" aria-describedby="ayuda-contrasena error-contrasena">
+            <button type="button" id="mostrar-contrasena" class="boton secundario" aria-pressed="false">Mostrar contraseña</button>
+          </div>
+          <p id="ayuda-contrasena" class="ayuda">Mínimo 8 caracteres.</p>
+          <p id="error-contrasena" class="error" hidden></p>
+        </div>
+
+        <button type="submit" class="boton">Crear cuenta</button>
+      </form>
+      <p id="mensaje-registro" class="estado" role="status" aria-live="polite"></p>
+    </section>
+  </main>
+
+  <footer class="pie">
+    <p>UniCursos · Proyecto académico para el curso de Aseguramiento de la Calidad del Software.</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

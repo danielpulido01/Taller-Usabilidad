@@ -1,0 +1,28 @@
+# Ejecuta la suite de usabilidad en cada push y pull request (fase de Implementación / CI).
+name: Pruebas de usabilidad
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  usabilidad:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      # La versión corregida debe pasar todas las pruebas; si una regresión rompe un criterio, el pipeline falla.
+      - run: npm run test:v2
+      - name: Publicar reporte
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reporte-usabilidad
+          path: reportes/
+          retention-days: 14

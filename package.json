@@ -1,0 +1,22 @@
+{
+  "name": "taller-usabilidad",
+  "version": "1.0.0",
+  "description": "Taller práctico de pruebas automatizadas de usabilidad y accesibilidad con Playwright y axe-core",
+  "private": true,
+  "scripts": {
+    "servidor:v1": "cross-env APP_VERSION=v1 node servidor.js",
+    "servidor:v2": "cross-env APP_VERSION=v2 node servidor.js",
+    "test:v1": "cross-env APP_VERSION=v1 playwright test --grep-invert @visual",
+    "test:v2": "cross-env APP_VERSION=v2 playwright test --grep-invert @visual",
+    "visual:base": "cross-env APP_VERSION=v2 SUITE=visual playwright test --grep @visual --update-snapshots",
+    "visual:v1": "cross-env APP_VERSION=v1 SUITE=visual playwright test --grep @visual",
+    "visual:v2": "cross-env APP_VERSION=v2 SUITE=visual playwright test --grep @visual",
+    "resumen": "node scripts/resumen.js",
+    "reporte": "playwright show-report reportes/html"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.10.0",
+    "@playwright/test": "^1.50.0",
+    "cross-env": "^7.0.3"
+  }
+}

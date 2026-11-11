@@ -1,0 +1,5 @@
+node_modules/
+reportes/
+test-results/
+playwright-report/
+tests/__lineas-base__/
