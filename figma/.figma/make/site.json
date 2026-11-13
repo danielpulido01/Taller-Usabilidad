@@ -1,0 +1,10 @@
+{
+  "description": "Gestiona tus cuentas y transfiere dinero en colones de forma clara y segura, con confirmación y comprobante para cada operación.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}

@@ -1,52 +1,50 @@
-// Funciones de apoyo compartidas por las pruebas de usabilidad.
+// Funciones de apoyo compartidas por las pruebas.
+const AxeBuilder = require('@axe-core/playwright').default;
 
-/** Describe un elemento de forma legible para los mensajes de error. */
-async function describir(locator) {
-  return locator.evaluate((el) => {
-    const texto = (el.innerText || el.value || el.getAttribute('aria-label') || el.getAttribute('placeholder') || '').trim();
-    return `<${el.tagName.toLowerCase()}${el.id ? '#' + el.id : ''}${el.className ? '.' + String(el.className).split(' ').join('.') : ''}> "${texto.slice(0, 40)}"`;
-  });
+/** Inicia sesión en el prototipo (acepta cualquier usuario y contraseña) y espera el inicio. */
+async function ingresar(page) {
+  await page.goto('/');
+  await page.getByLabel('Usuario').fill('mvargas');
+  await page.getByLabel('Contraseña', { exact: true }).fill('Prueba123');
+  await page.getByRole('button', { name: 'Ingresar' }).click();
+  await page.getByRole('heading', { name: 'Usuario Test' }).waitFor();
 }
 
-/**
- * Recorre la página con la tecla Tab y devuelve información de cada elemento enfocado.
- * Marca cada elemento visitado con data-visitado="1" para verificar alcance por teclado.
- */
-async function recorrerConTab(page, maxPasos = 60) {
-  const paradas = [];
-  for (let i = 0; i < maxPasos; i++) {
-    await page.keyboard.press('Tab');
-    const info = await page.evaluate(() => {
-      const el = document.activeElement;
-      if (!el || el === document.body) return null;
-      el.setAttribute('data-visitado', '1');
-      const s = getComputedStyle(el);
-      const contorno = s.outlineStyle !== 'none' && parseFloat(s.outlineWidth) > 0;
-      const sombra = s.boxShadow && s.boxShadow !== 'none';
-      return {
-        etiqueta: el.tagName.toLowerCase(),
-        texto: (el.innerText || el.value || el.getAttribute('aria-label') || el.name || '').trim().slice(0, 40),
-        focoVisible: Boolean(contorno || sombra),
-      };
-    });
-    if (!info) break;
-    paradas.push(info);
-  }
-  return paradas;
+/** Desde el inicio, abre el paso 1 de la transferencia con el botón principal de la tarjeta de saldo. */
+async function abrirTransferencia(page) {
+  // El primero es el botón principal de la tarjeta de saldo; el segundo, el acceso rápido.
+  await page.getByRole('main').getByRole('button', { name: 'Transferir', exact: true }).first().click();
+  await page.getByRole('heading', { name: '¿A quién le transfieres?' }).waitFor();
 }
 
-/** Mide el Cumulative Layout Shift acumulado en la página. */
-async function medirCLS(page) {
-  return page.evaluate(
-    () =>
-      new Promise((resolve) => {
-        let total = 0;
-        new PerformanceObserver((lista) => {
-          for (const e of lista.getEntries()) if (!e.hadRecentInput) total += e.value;
-        }).observe({ type: 'layout-shift', buffered: true });
-        setTimeout(() => resolve(Number(total.toFixed(3))), 200);
-      })
+/** Ejecuta axe-core con las reglas WCAG 2.2 A/AA y devuelve un resumen legible por violación. */
+async function revisarAccesibilidad(page) {
+  const resultado = await new AxeBuilder({ page })
+    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
+    .analyze();
+  return resultado.violations.map(
+    (v) => `${v.id}: ${v.help} (${v.nodes.length}) → ${v.nodes.slice(0, 3).map((n) => n.target.join(' ')).join(', ')}`
   );
 }
 
-module.exports = { describir, recorrerConTab, medirCLS };
+module.exports = { ingresar, abrirTransferencia, revisarAccesibilidad };
+
+/**
+ * Hace una transferencia de ₡25 000 a Ana Rodríguez hasta la pantalla de éxito.
+ * Funciona en v1 y en v2 (ubica el monto por id y confirma solo si existe el paso de confirmación) para que las
+ * pruebas de la pantalla de éxito no fallen por otros defectos del camino.
+ */
+async function completarTransferencia(page) {
+  await abrirTransferencia(page);
+  await page.getByText('Ana Rodríguez Mora', { exact: true }).click();
+  await page.getByRole('button', { name: 'Continuar' }).click();
+  await page.locator('#amount').fill('25000');
+  await page.getByRole('button', { name: 'Continuar' }).click();
+  const confirmar = page.getByRole('button', { name: 'Confirmar transferencia' });
+  const exito = page.getByRole('heading', { name: 'Transferencia exitosa' });
+  await confirmar.or(exito).waitFor();
+  if (await confirmar.isVisible()) await confirmar.click();
+  await exito.waitFor();
+}
+
+module.exports.completarTransferencia = completarTransferencia;

@@ -1,25 +1,24 @@
-# Taller: Pruebas Automatizadas de Usabilidad
+# Taller de usabilidad de software
 
-Taller práctico del curso **Aseguramiento de la Calidad del Software**. Demuestra cómo convertir criterios de usabilidad
-(heurísticas de Nielsen, WCAG 2.2, ISO/IEC 25010, Core Web Vitals) en pruebas automatizadas que se ejecutan en cada cambio,
-igual que las pruebas unitarias.
+Material del taller del curso **Aseguramiento de la Calidad del Software**. Los participantes recorren un ciclo completo
+de evaluación de usabilidad: inspeccionar → probar con usuarios → medir → priorizar → iterar → proteger.
 
-## Contexto
+Todo gira alrededor de **Banco Aurora**, un prototipo de banca en línea hecho en Figma Make. Las Partes 1 a 4 (heurísticas,
+Maze, SUS/SEQ e iteración) se hacen sobre el prototipo. Este repositorio contiene la app como código y cubre la Parte 5:
+convertir los problemas corregidos en pruebas automáticas con Playwright y axe-core.
 
-**UniCursos** es un portal de matrícula universitaria con tres tareas: buscar cursos, inscribir/retirar cursos y registrarse.
-Hay dos versiones:
-
-| Carpeta | Descripción |
+| Carpeta | Contenido |
 | --- | --- |
-| `app/v1` | Versión con 14 defectos de usabilidad intencionales (ver [docs/defectos-v1.md](docs/defectos-v1.md)) |
-| `app/v2` | Versión corregida |
+| `app/v1` | Versión con 9 problemas sembrados a propósito (ver [docs/defectos-v1.md](docs/defectos-v1.md)) |
+| `app/v2` | Versión corregida: el prototipo de Figma Make sin cambios |
+| `figma/` | Exportación original de Figma Make (referencia; no se modifica) |
 
-La suite de 24 pruebas (`tests/`) debe **fallar en v1** y **pasar en v2**. Así se demuestra que las pruebas detectan
-los defectos y no producen falsos positivos.
+Las pruebas de `tests/` deben **fallar en v1** y **pasar en v2**. Así se demuestra que detectan los problemas y no
+producen falsos positivos.
 
 ## Requisitos
 
-- Node.js 18 o superior (probado con 20.14)
+- Node.js 20 o superior (probado con 20.14)
 - Git
 - Windows, macOS o Linux
 
@@ -27,96 +26,89 @@ los defectos y no producen falsos positivos.
 
 | Herramienta | Uso |
 | --- | --- |
-| [Playwright Test](https://playwright.dev/) | Ejecuta el navegador, simula teclado/toque, emula móvil, toma capturas |
-| [@axe-core/playwright](https://github.com/dequelabs/axe-core-npm) | Motor de reglas WCAG de Deque |
-| Performance API del navegador | Mide CLS y tiempo de carga |
+| React 19, Vite 6 y Tailwind CSS 4 | La app de demostración, igual que en Figma Make |
+| [Playwright Test](https://playwright.dev/) | Ejecuta el navegador, simula al usuario y toma capturas |
+| [@axe-core/playwright](https://github.com/dequelabs/axe-core-npm) | Revisión automática de reglas WCAG 2.2 A/AA |
 | cross-env | Variables de entorno multiplataforma |
-| GitHub Actions | Ejecución en CI (`.github/workflows/usabilidad.yml`) |
+| GitHub Actions | Pruebas en cada cambio (`usabilidad.yml`) y publicación en GitHub Pages (`pages.yml`) |
 
-## Pasos del taller
+## Uso
 
 ```bash
-# 1. Instalar
-git clone <url-del-repositorio>
+# Instalar
+git clone https://github.com/danielpulido01/Taller-Usabilidad.git
 cd Taller-Usabilidad
 npm install
 npx playwright install chromium
 
-# 2. Explorar la app manualmente (abrir http://localhost:4173)
-npm run servidor:v1      # Ctrl+C para detener
+# Ver la app en http://localhost:4173 (Ctrl+C para detener). Para entrar, cualquier usuario y contraseña.
+npm run servidor:v1
 npm run servidor:v2
 
-# 3. Ejecutar la suite contra la versión con defectos (se esperan fallas)
-npm run test:v1
+# Pruebas
+npm run test:v1          # se esperan 3 fallas
+npm run test:v2          # se espera todo en verde
+npm run resumen          # matriz v1 vs v2 en reportes/resumen.md
+npm run reporte          # reporte HTML con capturas y trazas
 
-# 4. Ejecutar la suite contra la versión corregida (se espera todo en verde)
-npm run test:v2
-
-# 5. Ver la matriz comparativa y el reporte HTML
-npm run resumen          # genera reportes/resumen.md
-npm run reporte          # abre el reporte HTML (último run)
-
-# 6. Regresión visual
+# Regresión visual
 npm run visual:base      # crea la línea base con v2
 npm run visual:v2        # pasa: no hay cambios
-npm run visual:v1        # falla: muestra la imagen de diferencias en el reporte
+npm run visual:v1        # falla y muestra la imagen de diferencias
 ```
 
-## Parte 2: prueba con usuarios en Maze
+| Prueba | Archivo | Qué protege |
+| --- | --- | --- |
+| T-01 | `tests/01-transferencia.spec.js` | La transferencia se revisa antes de enviarse y termina con un comprobante (D-06) |
+| T-02 | `tests/01-transferencia.spec.js` | El error de monto explica cuánto se puede transferir (D-04) |
+| T-03 | `tests/02-accesibilidad.spec.js` | Sin violaciones de axe en 4 pantallas: contraste y etiquetas (D-08, D-09) |
+| T-04 | `tests/03-regresion-visual.spec.js` | El paso 1 de la transferencia coincide con la línea base aprobada |
 
-La suite automática verifica criterios conocidos; la prueba con personas mide éxito, tiempo y satisfacción, y encuentra
-problemas nuevos. El protocolo completo (tareas, preguntas, SUS, análisis) está en
-[docs/estudio-maze.md](docs/estudio-maze.md).
+## Ejercicios (Parte 5 del taller)
+
+| Paso | Ejercicio | Tiempo |
+| --- | --- | --- |
+| 5.1 | Instalar y verificar | 5 min |
+| 5.2 | Escribir una prueba para el problema que corrigió el equipo (D-01, D-02, D-03, D-05 o D-07) | 15 min |
+| 5.3 | Encontrar y corregir con axe los errores de accesibilidad sembrados en v1 | 20 min |
+| 5.4 | Cierre: qué no se puede automatizar | 5 min |
+
+La guía, con tres ejercicios adicionales, está en [docs/ejercicios.md](docs/ejercicios.md). Las soluciones
+verificadas están en [docs/soluciones-ejercicios.md](docs/soluciones-ejercicios.md) y [soluciones/](soluciones).
+
+## Opcional: Maze sobre la app publicada
+
+Al hacer push a `main`, `pages.yml` compila y publica las dos versiones:
+
+- https://danielpulido01.github.io/Taller-Usabilidad/v1/
+- https://danielpulido01.github.io/Taller-Usabilidad/v2/
+
+Con esas URL se puede hacer en Maze una prueba de sitio en vivo (*live website testing*). El protocolo, con tareas,
+SEQ, SUS y análisis, está en [docs/estudio-maze.md](docs/estudio-maze.md).
 
 ```bash
-# 1. Publicar v1 y v2 en GitHub Pages (Settings › Pages › Source: GitHub Actions; luego push a main)
-#    → https://<usuario>.github.io/Taller-Usabilidad/v1/  y  /v2/
-# 2. (Opcional) Guardar el snippet de Maze en la variable de repositorio MAZE_SNIPPET y volver a publicar
 npm run sitio            # genera _site/ localmente para revisar lo que se publica
-# 3. Crear en Maze los estudios "UniCursos v1" y "UniCursos v2" según el protocolo y compartir los enlaces
-# 4. Exportar resultados, copiar respuestas SUS a estudio/resultados-sus.csv (formato de plantilla-sus.csv)
-npm run sus              # calcula el SUS promedio por versión
+npm run sus              # calcula el SUS por versión desde estudio/resultados-sus.csv
 npm run sus:ejemplo      # prueba el cálculo con datos ficticios
 ```
 
 ## Estructura
 
 ```
-app/v1, app/v2           Aplicación bajo prueba (HTML/CSS/JS sin frameworks)
-servidor.js              Servidor estático (APP_VERSION=v1|v2)
-playwright.config.js     Proyectos "escritorio" (Desktop Chrome) y "movil" (Pixel 5)
+app/v1, app/v2           App de demostración (React + Vite + Tailwind); APP_VERSION=v1|v2 elige cuál
+figma/                   Exportación original de Figma Make
+vite.config.mjs          Servidor y compilación de la versión elegida
+playwright.config.js     Proyecto "escritorio" (Chrome, 1440 × 900)
 tests/
-  01-accesibilidad.spec.js          U-01..U-03  axe-core, idioma, texto alternativo
-  02-formularios.spec.js            U-04..U-09  etiquetas, tipos, errores, retroalimentación
-  03-teclado.spec.js                U-10..U-13  skip link, alcance por Tab, foco visible
-  04-heuristicas.spec.js            U-14..U-19  Nielsen, objetivos táctiles, legibilidad
-  05-responsive-rendimiento.spec.js U-20..U-23  viewport, scroll horizontal, CLS, carga
-  06-regresion-visual.spec.js       U-24        captura contra línea base
+  ayudantes.js                      ingresar, abrirTransferencia, completarTransferencia, revisarAccesibilidad
+  01-transferencia.spec.js          T-01, T-02  flujo de transferencia y mensaje de error
+  02-accesibilidad.spec.js          T-03        axe-core en 4 pantallas
+  03-regresion-visual.spec.js       T-04        captura contra línea base (@visual)
+soluciones/              Pruebas S-01..S-06 de las soluciones (fuera de testDir)
 scripts/resumen.js       Matriz de resultados v1 vs v2
-scripts/preparar-pages.js  Genera _site/ para GitHub Pages e inserta el snippet de Maze
+scripts/preparar-pages.js  Compila v1 y v2 en _site/ e inserta el snippet de Maze
 scripts/sus.js           Calcula el System Usability Scale desde un CSV
 estudio/                 Plantilla CSV del SUS y datos ficticios de ejemplo
-docs/defectos-v1.md      Catálogo de defectos y prueba que los detecta
-docs/estudio-maze.md     Protocolo de la prueba con usuarios en Maze
-docs/ejercicios.md       Guía de ejercicios del taller (E1..E7)
-docs/soluciones-ejercicios.md  Soluciones y resultados verificados
-soluciones/              Pruebas U-25 y U-26 de las soluciones (fuera de testDir)
+docs/                    Problemas sembrados, guía de ejercicios, soluciones y protocolo de Maze
 .github/workflows/       usabilidad.yml (CI de pruebas) y pages.yml (publicación)
 ```
-
-## Ejercicios
-
-La guía completa, con pasos, resultado esperado y preguntas, está en [docs/ejercicios.md](docs/ejercicios.md).
-
-| # | Ejercicio | Qué se aprende |
-| --- | --- | --- |
-| E1 | Leer un reporte de fallas de v1 | Traducir una prueba fallida en defecto, criterio y severidad |
-| E2 | Quitar la etiqueta del campo Correo en v2 | La suite detecta regresiones (fallan U-01 y U-04) |
-| E3 | Corregir el foco invisible (D-08) en v1 | Verificar una corrección con su prueba (U-12 pasa) |
-| E4 | Escribir U-25 para "Mostrar contraseña" | Convertir un criterio en una prueba nueva |
-| E5 | Cambiar el color primario de v2 | La regresión visual detecta cambios; las demás pruebas juzgan si son defectos |
-| E6 | Introducir un defecto que la suite no detecte (reto) | Límites de la automatización |
-| E7 | Triangular con los resultados de Maze | Comparar la suite con la experiencia de personas reales |
-
-Las soluciones verificadas están en [docs/soluciones-ejercicios.md](docs/soluciones-ejercicios.md) y
-[soluciones/](soluciones).

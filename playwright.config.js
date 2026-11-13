@@ -12,7 +12,7 @@ module.exports = defineConfig({
   retries: 0,
   timeout: 20_000,
   expect: { timeout: 3_000 },
-  // Las líneas base visuales se guardan por versión de navegador/SO.
+  // Las líneas base visuales se guardan por sistema operativo.
   snapshotPathTemplate: '{testDir}/__lineas-base__/{testFilePath}/{arg}-{projectName}-{platform}{ext}',
   reporter: [
     ['list'],
@@ -26,15 +26,13 @@ module.exports = defineConfig({
     screenshot: 'only-on-failure',
     locale: 'es-CR',
   },
-  projects: [
-    { name: 'escritorio', use: { ...devices['Desktop Chrome'] } },
-    { name: 'movil', use: { ...devices['Pixel 5'] } },
-  ],
+  // El prototipo de Figma está diseñado para computadora (1440 px de ancho), así que solo hay un proyecto.
+  projects: [{ name: 'escritorio', use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } } }],
   webServer: {
-    command: 'node servidor.js',
+    command: 'npx vite --config vite.config.mjs',
     url: `http://localhost:${puerto}`,
     env: { APP_VERSION: version, PORT: String(puerto) },
     reuseExistingServer: false,
-    timeout: 15_000,
+    timeout: 30_000,
   },
 });

@@ -1,4 +1,4 @@
-# Publica app/v1 y app/v2 en GitHub Pages para las pruebas con usuarios en Maze.
+# Compila y publica app/v1 y app/v2 en GitHub Pages para las pruebas con usuarios en Maze.
 # URL resultante: https://<usuario>.github.io/Taller-Usabilidad/v1/  y  .../v2/
 # Opcional: crear la variable de repositorio MAZE_SNIPPET (Settings › Secrets and variables › Actions › Variables)
 # con el código que entrega Maze; se inserta automáticamente en cada página.
@@ -7,7 +7,7 @@ name: Publicar en GitHub Pages
 on:
   push:
     branches: [main]
-    paths: ['app/**', 'scripts/preparar-pages.js', '.github/workflows/pages.yml']
+    paths: ['app/**', 'vite.config.mjs', 'package-lock.json', 'scripts/preparar-pages.js', '.github/workflows/pages.yml']
   workflow_dispatch:
 
 permissions:
@@ -30,6 +30,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: npm
+      - run: npm ci
       - run: node scripts/preparar-pages.js
         env:
           MAZE_SNIPPET: ${{ vars.MAZE_SNIPPET }}

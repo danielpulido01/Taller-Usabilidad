@@ -5,15 +5,15 @@ const path = require('path');
 
 const dir = path.join(__dirname, '..', 'reportes');
 const versiones = ['v1', 'v2'];
-const proyectos = ['escritorio', 'movil'];
+const proyectos = ['escritorio'];
 const simbolo = { expected: 'PASA', unexpected: 'FALLA', skipped: 'N/A', flaky: 'INESTABLE' };
 
 const filas = new Map(); // id -> { titulo, archivo, resultados: { 'v1/escritorio': 'PASA' } }
 
 function recorrer(suite, archivo, version) {
   for (const spec of suite.specs || []) {
-    const id = (spec.title.match(/^U-\d+/) || [spec.title])[0];
-    const fila = filas.get(id) || { titulo: spec.title.replace(/^U-\d+\s*/, ''), archivo, resultados: {} };
+    const id = (spec.title.match(/^[A-Z]-\d+/) || [spec.title])[0];
+    const fila = filas.get(id) || { titulo: spec.title.replace(/^[A-Z]-\d+\s*/, ''), archivo, resultados: {} };
     for (const t of spec.tests) fila.resultados[`${version}/${t.projectName}`] = simbolo[t.status] || t.status;
     filas.set(id, fila);
   }

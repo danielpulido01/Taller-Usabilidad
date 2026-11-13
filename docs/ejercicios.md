@@ -1,154 +1,113 @@
-# Ejercicios del taller
+# Parte 5 del taller: proteger los flujos con Playwright
 
-Siete ejercicios, de leer resultados a escribir pruebas propias. Cada uno indica qué hacer, cómo comprobar el resultado
-y qué entregar. Antes de empezar, complete la instalación del [README](../README.md#pasos-del-taller).
+Esta guía cubre la Parte 5 del plan del taller (45 min). Las Partes 1 a 4 (heurísticas, Maze, SUS/SEQ e iteración) se
+hacen sobre el prototipo y no usan este repositorio.
 
-| # | Ejercicio | Tiempo | Modalidad | Bloque de la agenda |
-| --- | --- | --- | --- | --- |
-| E1 | Leer un reporte de fallas | 15 min | Individual | 4 |
-| E2 | Introducir una regresión en v2 | 7 min | Individual | 5 |
-| E3 | Corregir el defecto D-08 en v1 | 8 min | Individual | 5 |
-| E4 | Escribir la prueba U-25 | 12 min | Parejas | 6 |
-| E5 | Regresión visual: ¿error o rediseño? | 8 min | Parejas | 6 |
-| E6 | Engañar a la suite (reto) | 15 min | Parejas | Tarea o extra |
-| E7 | Triangular con los resultados de Maze | 10 min | Todos | 7 |
+Playwright no mide usabilidad. Su papel es **proteger** lo aprendido: cada problema corregido en la Parte 4 se
+convierte en una prueba que avisa si alguien lo vuelve a romper.
 
-**Regla para E2, E3, E5 y E6:** son cambios temporales a la app. Al terminar cada uno, deshágalos con
-`git checkout -- app/` para que el siguiente ejercicio parta de la versión original.
+| Paso | Actividad | Tiempo |
+| --- | --- | --- |
+| 5.1 | Instalar y verificar el entorno | 5 min (idealmente antes del taller) |
+| 5.2 | Escribir una prueba de flujo para el problema que corrigió su equipo | 15 min |
+| 5.3 | Encontrar y corregir los errores de accesibilidad sembrados | 20 min |
+| 5.4 | Cierre: ¿qué no se puede automatizar? | 5 min |
 
----
+## La app de demostración
 
-## E1. Leer un reporte de fallas
+**Banco Aurora** es el prototipo de Figma Make exportado como código (React, Vite y Tailwind). Tiene inicio de sesión,
+inicio, cuentas, una transferencia en 3 pasos y configuración. Para entrar se escribe cualquier usuario y contraseña.
 
-**Objetivo.** Traducir una prueba fallida en un defecto de usabilidad con su criterio y severidad.
+- `app/v1`: la versión con problemas sembrados (el prototipo v1 de las Partes 1 a 4).
+- `app/v2`: la versión corregida.
 
-1. Ejecute `npm run test:v1` y luego `npm run reporte`.
-2. En el reporte HTML, abra tres pruebas fallidas **de archivos distintos** (por ejemplo, una de `02-formularios`,
-   una de `03-teclado` y una de `05-responsive-rendimiento`).
-3. Para cada una, lea el mensaje de error, la captura y, si hace falta, la traza (*Trace*).
-4. Llene la tabla.
+| Problema sembrado en v1 | Corrección en v2 | Prueba |
+| --- | --- | --- |
+| D-01 El menú llama "Mi Aurora" a la configuración del perfil | "Configuración" | Para escribir en 5.2 |
+| D-02 "Continuar" parece un enlace gris y "Cancelar" es el botón destacado | "Continuar" es el botón principal | Para escribir en 5.2 |
+| D-03 Guardar el perfil no muestra ningún aviso | "Guardamos los cambios de tu perfil." | Para escribir en 5.2 |
+| D-04 El error de monto solo dice "Error: monto inválido." | Explica cuánto se puede transferir | T-02 (ejemplo) |
+| D-05 "Descargar comprobante" está escondido en un menú "⋯" | Botón visible | Para escribir en 5.2 |
+| D-06 El dinero se envía sin un paso para revisar | Paso "Confirma tu transferencia" | T-01 (ejemplo) |
+| D-07 No se indica en qué paso del proceso está el usuario | "Paso 1 de 3" | Para escribir en 5.2 |
+| D-08 El campo del monto no tiene etiqueta | Etiqueta "Monto en colones" | T-03 (axe) |
+| D-09 El texto secundario tiene bajo contraste | Contraste ≥ 4.5:1 | T-03 (axe) |
 
-| Prueba | ¿Qué elemento falla? | ¿Qué le pasaría a un usuario real? | Defecto (D-xx) | Criterio (WCAG o heurística) | Severidad 0–4 |
-| --- | --- | --- | --- | --- | --- |
-| | | | | | |
-| | | | | | |
-| | | | | | |
-
-**Cómo comprobar.** Compare sus columnas "Defecto" y "Criterio" con [defectos-v1.md](defectos-v1.md).
-
-**Pregunta.** U-01 usa axe-core, un motor de reglas WCAG. ¿Cuántos de los 14 defectos detecta por sí solo?
+El detalle de cada problema, con el archivo donde está, se encuentra en [defectos-v1.md](defectos-v1.md).
 
 ---
 
-## E2. Introducir una regresión en v2
+## 5.1 Instalar y verificar
 
-**Objetivo.** Ver que la suite protege la versión corregida: un cambio que empeora la usabilidad rompe el pipeline.
+```bash
+git clone https://github.com/danielpulido01/Taller-Usabilidad.git
+cd Taller-Usabilidad
+npm install
+npx playwright install chromium
+npm run test:v2      # 3 aprobadas (T-01, T-02 y T-03)
+npm run test:v1      # las mismas 3 fallan
+```
 
-1. **Antes de ejecutar nada**, escriba qué pruebas cree que van a fallar.
-2. En `app/v2/index.html`, borre la línea `<label for="correo">…</label>` del campo Correo.
-3. Ejecute `npm run test:v2`.
-4. Restaure con `git checkout -- app/`.
+Para ver la app: `npm run servidor:v1` o `npm run servidor:v2`, y abra http://localhost:4173. La app está diseñada para
+computadora: use una ventana de al menos 1440 px de ancho. Los cambios en el código se ven al instante, sin recargar.
 
-**Resultado esperado.** Deben fallar 4 pruebas: dos pruebas distintas, cada una en escritorio y en móvil.
+## 5.2 Prueba de flujo para el problema que corrigió su equipo
 
-**Preguntas.**
+**Objetivo.** Convertir un hallazgo corregido en una prueba que falle con v1 y pase con v2.
 
-- ¿Acertó su predicción?
-- Las dos pruebas que fallan detectan el mismo cambio. ¿Qué verifica cada una?
-- El campo conserva el texto de ayuda "Ejemplo: ana.perez@correo.com". ¿Por qué no basta como etiqueta?
+1. Elija de la tabla el problema que su equipo priorizó en la Parte 4, entre los marcados "Para escribir en 5.2". Si
+   su problema ya tiene ejemplo, elija el siguiente de su lista.
+2. Escriba en una frase qué debe poder hacer el usuario en v2. Por ejemplo: "Después de guardar mi perfil, el sistema
+   me dice que los cambios se guardaron".
+3. Cree `tests/04-equipo-<nombre>.spec.js`. Copie la estructura de `tests/01-transferencia.spec.js` y use las funciones
+   de `tests/ayudantes.js`: `ingresar`, `abrirTransferencia` y `completarTransferencia`.
+4. Ejecute `npm run test:v2`: su prueba debe **pasar**.
+5. Ejecute `npm run test:v1`: su prueba debe **fallar**. Revise el mensaje: debe fallar por **su** problema, no por
+   otro del camino.
 
----
+**Consejos.**
 
-## E3. Corregir el defecto D-08 en v1
+- Ubique los elementos como lo haría una persona: `getByRole('button', { name: 'Guardar cambios' })` o
+  `getByLabel('Teléfono celular')`. Si el localizador no encuentra el elemento, ese elemento no tiene un nombre
+  accesible: ya es un hallazgo de accesibilidad.
+- Verifique lo que ve el usuario (un mensaje, un botón, un título), no detalles internos del código.
+- Para ejecutar solo su prueba: `npx cross-env APP_VERSION=v1 playwright test -g "<parte del título>"`.
 
-**Objetivo.** Corregir un defecto y confirmar la corrección con su prueba, igual que al cerrar un bug.
+## 5.3 Errores de accesibilidad sembrados
 
-1. Ejecute solo la prueba del foco:
-   `npx cross-env APP_VERSION=v1 playwright test -g U-12`. Anote cuántos controles reporta sin foco visible.
-2. En `app/v1/estilos.css`, reemplace la regla que causa el defecto (línea 5) por un indicador de foco visible de al
-   menos 2 px.
-3. Ejecute la misma prueba otra vez.
-4. Ejecute `npm run test:v1` y compare el total de pruebas aprobadas con el de E1.
-5. Restaure con `git checkout -- app/`.
+**Objetivo.** Usar axe para encontrar errores de accesibilidad y corregirlos hasta que la prueba pase.
 
-**Resultado esperado.** U-12 pasa en escritorio y en móvil, y v1 pasa de 1 a 3 pruebas aprobadas.
+1. Ejecute solo la prueba de axe contra v1: `npx cross-env APP_VERSION=v1 playwright test -g T-03`.
+2. Lea la lista de violaciones. Cada línea indica la pantalla, la regla, cuántos elementos afecta y los selectores de
+   los tres primeros.
+3. Abra la app (`npm run servidor:v1`) y ubique cada elemento con las herramientas de desarrollador.
+4. Corrija el código en `app/v1/src/` y repita el paso 1 hasta que T-03 pase.
+5. Ejecute `npm run test:v1`. T-03 pasa, pero T-01 y T-02 siguen fallando. ¿Por qué?
+6. Restaure v1 con `git checkout -- app/`.
 
-**Preguntas.**
+**Resultado esperado.** Al inicio, axe reporta dos reglas: `color-contrast` en las 4 pantallas revisadas y `label` en
+el campo del monto. Se corrigen cambiando 2 líneas.
 
-- ¿Por qué conviene usar `:focus-visible` en lugar de `:focus`?
-- U-12 ahora pasa en v1, pero v1 aún tiene controles que no se alcanzan con teclado. ¿Qué prueba los detecta y por qué
-  U-12 no?
+## 5.4 Cierre
 
----
+Discutan en equipo:
 
-## E4. Escribir la prueba U-25
-
-**Objetivo.** Convertir un criterio de usabilidad en una prueba nueva.
-
-**Criterio.** El botón "Mostrar contraseña" del registro debe:
-
-1. Iniciar con `aria-pressed="false"` y el campo de contraseña oculto (`type="password"`).
-2. Al pulsarlo, mostrar la contraseña (`type="text"`), cambiar a `aria-pressed="true"` y decir "Ocultar contraseña".
-3. Al pulsarlo otra vez, volver al estado inicial **sin borrar** lo escrito.
-
-**Pasos.**
-
-1. Cree `tests/07-mostrar-contrasena.spec.js`. Use como modelo `tests/04-heuristicas.spec.js`.
-2. Ejecute `npx cross-env APP_VERSION=v2 playwright test -g U-25`: debe **pasar**.
-3. Ejecute `npx cross-env APP_VERSION=v1 playwright test -g U-25`: debe **fallar**, porque v1 no tiene ese botón.
-
-**Pista.** Si la prueba falla en v2 después del primer clic, revise cómo ubica el botón. ¿Qué le pasa a su nombre
-cuando se pulsa?
-
-**Entrega.** El archivo de prueba y la salida de las dos ejecuciones.
+- ¿Qué hallazgos de las Partes 1 a 4 **no** se pueden convertir en prueba automática? Por ejemplo, "no sabía qué era
+  *Mi Aurora*" o un SUS bajo.
+- La prueba S-05 verifica el color y el tamaño de "Continuar". ¿Garantiza eso que la gente lo encuentre? ¿Qué lo
+  garantiza?
 
 ---
 
-## E5. Regresión visual: ¿error o rediseño?
+## Ejercicios adicionales (opcionales)
 
-**Objetivo.** Distinguir entre detectar un cambio y juzgar si ese cambio es bueno.
+Para quien termine antes o como tarea. Las soluciones verificadas están en
+[soluciones-ejercicios.md](soluciones-ejercicios.md).
 
-Requiere la línea base: si no la creó en el paso 6 del README, ejecute `npm run visual:base`.
+| # | Ejercicio | Resultado esperado |
+| --- | --- | --- |
+| A1 | **Romper v2.** En `app/v2/src/screens/Transfer.tsx`, quite el `<Label>` "Monto en colones" y ejecute `npm run test:v2`. Antes, prediga qué falla | Fallan T-01 y T-02; T-03 sigue pasando |
+| A2 | **¿Error o rediseño?** Cree la línea base (`npm run visual:base`). Cambie `--color-brand` en `app/v2/src/index.css` a `#f87171` y luego a `#1d4ed8`. Ejecute `npm run visual:v2` y `npm run test:v2` cada vez | La prueba visual falla en ambos casos; solo `#f87171` rompe el contraste |
+| A3 | **Engañar a la suite.** Meta en v2 un problema de usabilidad que ninguna prueba detecte y escriba la prueba que lo detecte | Suite en verde con el problema; la prueba nueva falla |
 
-1. **Cambio A.** En `app/v2/estilos.css`, cambie `--primario: #1d4ed8;` por `--primario: #60a5fa;`.
-   Ejecute `npm run visual:v2` y luego `npm run test:v2`. Anote qué falla.
-2. **Cambio B.** Cambie el mismo valor por `--primario: #15803d;`. Repita las dos ejecuciones.
-3. Restaure con `git checkout -- app/`.
-
-**Preguntas.**
-
-- La prueba visual falla en A y en B. ¿Cuál de los dos cambios es un defecto y cuál podría ser un rediseño aceptado?
-  ¿Qué prueba le dio la respuesta?
-- Si B fuera un rediseño aprobado, ¿qué comando ejecutaría y quién debería aprobarlo?
-
----
-
-## E6. Engañar a la suite (reto)
-
-**Objetivo.** Descubrir los límites de la automatización: una suite verde no garantiza una interfaz usable.
-
-1. Introduzca en `app/v2` un defecto de usabilidad que **ninguna** de las 24 pruebas detecte, y confirme con
-   `npm run test:v2` que todo sigue en verde. Ideas: mensajes en jerga técnica, textos ambiguos, orden ilógico.
-2. Escriba la prueba U-26 que lo detecte, en `tests/08-<nombre>.spec.js`.
-3. Demuestre que U-26 falla con su defecto y pasa al restaurar con `git checkout -- app/`.
-
-**Entrega.** El defecto (qué cambió y qué heurística viola), la prueba U-26 y las dos ejecuciones.
-
-**Reto extra.** U-22 (CLS) pasa en `v1/movil` aunque v1 tiene un banner que empuja el contenido. Compare el resultado
-de U-22 en escritorio y en móvil y explique por qué la medición no lo detecta en el teléfono. Pista: revise
-`medirCLS` en `tests/ayudantes.js` y el defecto D-12.
-
----
-
-## E7. Triangular con los resultados de Maze
-
-**Objetivo.** Comparar lo que encontraron las pruebas automáticas con lo que vivieron las personas.
-
-Requiere el estudio previo en Maze (ver [estudio-maze.md](estudio-maze.md)).
-
-1. El grupo expositor presenta la tasa de éxito, la mediana de tiempo y el SEQ por tarea, y el SUS de cada versión.
-2. Entre todos, llenen la matriz de triangulación de la sección 7 de [estudio-maze.md](estudio-maze.md).
-3. Discutan:
-   - ¿Qué defecto detectado por la suite afectó más a los participantes?
-   - ¿Qué problema encontraron los participantes que ninguna prueba detecta? ¿Se podría automatizar como en E6?
-   - ¿Hubo algún defecto que la suite detectó pero que nadie sufrió? ¿Sigue siendo importante corregirlo?
+Después de cada uno, restaure con `git checkout -- app/`.

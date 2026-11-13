@@ -1,62 +1,15 @@
 <!doctype html>
-<!-- UniCursos v1: versión CON DEFECTOS DE USABILIDAD INTENCIONALES (ver docs/defectos-v1.md). -->
-<html>
-<head>
-  <meta charset="utf-8">
-  <link rel="stylesheet" href="estilos.css">
-  <script>
-    // Defecto D-14: script pesado que bloquea la carga (~1.2 s).
-    (function () { var t = Date.now(); while (Date.now() - t < 1200) {} })();
-  </script>
-</head>
-<body>
-  <div class="contenedor">
-    <div class="encabezado">
-      <img src="logo.svg">
-      <div class="menu">
-        <span onclick="location.hash='cursos'">Cursos</span>
-        <span onclick="location.hash='mis-cursos'">Mis cursos</span>
-        <span onclick="location.hash='registro'">Registro</span>
-      </div>
-    </div>
-
-    <div id="contenido">
-      <div class="titulo">Matrícula de cursos</div>
-
-      <div id="cursos">
-        <div class="subtitulo">Cursos disponibles</div>
-        <form id="form-busqueda">
-          <input id="buscar" name="q" placeholder="buscar...">
-          <button type="submit">Ir</button>
-        </form>
-        <div id="lista-cursos"></div>
-      </div>
-
-      <div id="mis-cursos">
-        <div class="subtitulo">Mis cursos</div>
-        <ul id="lista-inscritos"></ul>
-      </div>
-
-      <div id="registro">
-        <div class="subtitulo">Registro</div>
-        <div id="mensaje-registro"></div>
-        <form id="form-registro">
-          <input name="nombre" placeholder="Nombre">
-          <input name="correo" type="text" placeholder="Email">
-          <input name="telefono" placeholder="Tel">
-          <select name="carrera">
-            <option value="">--</option>
-            <option>Ingeniería de Software</option>
-            <option>Ingeniería Industrial</option>
-            <option>Administración de Empresas</option>
-          </select>
-          <input name="contrasena" type="password" placeholder="Clave">
-          <button type="submit">Enviar</button>
-        </form>
-      </div>
-    </div>
-    <div class="pie">UniCursos 2026</div>
-  </div>
-  <script src="app.js"></script>
-</body>
+<!-- Banco Aurora v1: versión CON PROBLEMAS DE USABILIDAD SEMBRADOS A PROPÓSITO (ver docs/defectos-v1.md). -->
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Gestiona tus cuentas y transfiere dinero en colones de forma clara y segura, con confirmación y comprobante para cada operación." />
+    <link rel="icon" href="./favicon.png" />
+    <title>Banco Aurora · Banca en línea</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="./src/main.tsx"></script>
+  </body>
 </html>
