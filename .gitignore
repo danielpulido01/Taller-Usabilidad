@@ -3,3 +3,4 @@ reportes/
 test-results/
 playwright-report/
 tests/__lineas-base__/
+_site/

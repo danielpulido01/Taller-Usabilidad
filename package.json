@@ -12,7 +12,10 @@
     "visual:v1": "cross-env APP_VERSION=v1 SUITE=visual playwright test --grep @visual",
     "visual:v2": "cross-env APP_VERSION=v2 SUITE=visual playwright test --grep @visual",
     "resumen": "node scripts/resumen.js",
-    "reporte": "playwright show-report reportes/html"
+    "reporte": "playwright show-report reportes/html",
+    "sitio": "node scripts/preparar-pages.js",
+    "sus": "node scripts/sus.js estudio/resultados-sus.csv",
+    "sus:ejemplo": "node scripts/sus.js estudio/ejemplo-sus-ficticio.csv"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.0",

@@ -16,7 +16,8 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
-      - run: npx playwright install --with-deps chromium
+      # Reintenta una vez: los espejos de apt de Ubuntu fallan de forma intermitente al instalar dependencias.
+      - run: npx playwright install --with-deps chromium || (sleep 20 && npx playwright install --with-deps chromium)
       # La versión corregida debe pasar todas las pruebas; si una regresión rompe un criterio, el pipeline falla.
       - run: npm run test:v2
       - name: Publicar reporte

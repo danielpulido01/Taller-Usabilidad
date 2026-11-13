@@ -62,6 +62,23 @@ npm run visual:v2        # pasa: no hay cambios
 npm run visual:v1        # falla: muestra la imagen de diferencias en el reporte
 ```
 
+## Parte 2: prueba con usuarios en Maze
+
+La suite automática verifica criterios conocidos; la prueba con personas mide éxito, tiempo y satisfacción, y encuentra
+problemas nuevos. El protocolo completo (tareas, preguntas, SUS, análisis) está en
+[docs/estudio-maze.md](docs/estudio-maze.md).
+
+```bash
+# 1. Publicar v1 y v2 en GitHub Pages (Settings › Pages › Source: GitHub Actions; luego push a main)
+#    → https://<usuario>.github.io/Taller-Usabilidad/v1/  y  /v2/
+# 2. (Opcional) Guardar el snippet de Maze en la variable de repositorio MAZE_SNIPPET y volver a publicar
+npm run sitio            # genera _site/ localmente para revisar lo que se publica
+# 3. Crear en Maze los estudios "UniCursos v1" y "UniCursos v2" según el protocolo y compartir los enlaces
+# 4. Exportar resultados, copiar respuestas SUS a estudio/resultados-sus.csv (formato de plantilla-sus.csv)
+npm run sus              # calcula el SUS promedio por versión
+npm run sus:ejemplo      # prueba el cálculo con datos ficticios
+```
+
 ## Estructura
 
 ```
@@ -76,12 +93,30 @@ tests/
   05-responsive-rendimiento.spec.js U-20..U-23  viewport, scroll horizontal, CLS, carga
   06-regresion-visual.spec.js       U-24        captura contra línea base
 scripts/resumen.js       Matriz de resultados v1 vs v2
+scripts/preparar-pages.js  Genera _site/ para GitHub Pages e inserta el snippet de Maze
+scripts/sus.js           Calcula el System Usability Scale desde un CSV
+estudio/                 Plantilla CSV del SUS y datos ficticios de ejemplo
 docs/defectos-v1.md      Catálogo de defectos y prueba que los detecta
+docs/estudio-maze.md     Protocolo de la prueba con usuarios en Maze
+docs/ejercicios.md       Guía de ejercicios del taller (E1..E7)
+docs/soluciones-ejercicios.md  Soluciones y resultados verificados
+soluciones/              Pruebas U-25 y U-26 de las soluciones (fuera de testDir)
+.github/workflows/       usabilidad.yml (CI de pruebas) y pages.yml (publicación)
 ```
 
-## Ejercicios propuestos
+## Ejercicios
 
-1. **Romper v2:** quite el `<label>` del campo Correo en `app/v2/index.html` y ejecute `npm run test:v2`. ¿Qué pruebas fallan?
-2. **Corregir v1:** arregle el defecto D-08 (foco invisible) en `app/v1/estilos.css` y verifique que U-12 pasa.
-3. **Nueva prueba:** escriba U-25 que verifique que el botón "Mostrar contraseña" cambia `aria-pressed`.
-4. **Analizar un falso negativo:** U-22 (CLS) pasa en `v1/movil`. Lea la sección de lecciones del documento y explique por qué.
+La guía completa, con pasos, resultado esperado y preguntas, está en [docs/ejercicios.md](docs/ejercicios.md).
+
+| # | Ejercicio | Qué se aprende |
+| --- | --- | --- |
+| E1 | Leer un reporte de fallas de v1 | Traducir una prueba fallida en defecto, criterio y severidad |
+| E2 | Quitar la etiqueta del campo Correo en v2 | La suite detecta regresiones (fallan U-01 y U-04) |
+| E3 | Corregir el foco invisible (D-08) en v1 | Verificar una corrección con su prueba (U-12 pasa) |
+| E4 | Escribir U-25 para "Mostrar contraseña" | Convertir un criterio en una prueba nueva |
+| E5 | Cambiar el color primario de v2 | La regresión visual detecta cambios; las demás pruebas juzgan si son defectos |
+| E6 | Introducir un defecto que la suite no detecte (reto) | Límites de la automatización |
+| E7 | Triangular con los resultados de Maze | Comparar la suite con la experiencia de personas reales |
+
+Las soluciones verificadas están en [docs/soluciones-ejercicios.md](docs/soluciones-ejercicios.md) y
+[soluciones/](soluciones).
