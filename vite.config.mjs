@@ -13,6 +13,8 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: { alias: { '@': path.join(raiz, 'src') } },
   server: { port: Number(process.env.PORT) || 4173, strictPort: true },
+  // Preempaqueta las dependencias al iniciar: evita que Vite recargue la página a mitad de la primera prueba.
+  optimizeDeps: { include: ['react', 'react-dom/client', 'react/jsx-dev-runtime', 'lucide-react'] },
   build: { outDir: process.env.SALIDA || path.resolve(import.meta.dirname, 'dist', version), emptyOutDir: true },
   clearScreen: false,
 });

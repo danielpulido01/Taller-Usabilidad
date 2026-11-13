@@ -2,7 +2,7 @@
 
 Resultados obtenidos al ejecutar cada ejercicio con Playwright 1.65, Chromium y Vite 6 en Windows.
 
-Las pruebas de solución están en [`soluciones/`](../soluciones). Esa carpeta queda fuera de `testDir`, así que la
+Las pruebas de solución están en [`soluciones/`](../../soluciones). Esa carpeta queda fuera de `testDir`, así que la
 suite no la ejecuta. Para probar una solución, copie el archivo a `tests/`.
 
 ## 5.1 Instalar y verificar
@@ -14,7 +14,7 @@ momento para mostrar que un localizador accesible ya funciona como prueba de acc
 
 ## 5.2 Prueba de flujo
 
-Solución de referencia: [`soluciones/04-problemas-equipos.spec.js`](../soluciones/04-problemas-equipos.spec.js), con
+Solución de referencia: [`soluciones/04-problemas-equipos.spec.js`](../../soluciones/04-problemas-equipos.spec.js), con
 una prueba por problema. Las 5 pasan con v2 y fallan con v1, cada una por su propio problema:
 
 | Prueba | Problema | Mensaje en v1 |
@@ -96,4 +96,4 @@ lo aprueba la persona dueña del diseño en la revisión del pull request, no qu
 Ejemplo verificado. En `app/v2/src/screens/Login.tsx`, cambiar el mensaje de error por
 `'Error 401: credenciales nulas.'`. La suite sigue dando **3 aprobadas**: ninguna prueba revisa el inicio de sesión
 vacío. El mensaje viola la heurística 9 y la 2 (jerga técnica). Solución:
-[`soluciones/05-reto-a3.spec.js`](../soluciones/05-reto-a3.spec.js). Falla con el cambio y pasa al restaurar.
+[`soluciones/05-reto-a3.spec.js`](../../soluciones/05-reto-a3.spec.js). Falla con el cambio y pasa al restaurar.
